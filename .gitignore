@@ -1,0 +1,11 @@
+# Ignore the virtual environment
+.venv/
+
+# Ignore data directories
+data/
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore models (save model files here)
+models/
