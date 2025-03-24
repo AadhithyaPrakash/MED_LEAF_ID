@@ -1,8 +1,8 @@
 # Ignore the virtual environment
-.venv/
+base/
 
 # Ignore data directories
-data/
+dataset/
 
 # Ignore Jupyter notebook checkpoints
 .ipynb_checkpoints/
