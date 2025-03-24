@@ -4,6 +4,9 @@ base/
 # Ignore data directories
 dataset/
 
+# Ignore data
+data/
+
 # Ignore Jupyter notebook checkpoints
 .ipynb_checkpoints/
 
