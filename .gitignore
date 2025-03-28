@@ -8,3 +8,5 @@ dataset/
 data/
 # Ignore Jupyter notebook checkpoints
 .ipynb_checkpoints/
+
+preprocessed_glcm/
