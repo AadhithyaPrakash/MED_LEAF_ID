@@ -17,7 +17,7 @@ The dataset used for this project is the **Indian Medicinal Leaves Image Dataset
 
 ## Project Structure
 
-```
+```bash
 MED_LEAF_ID/
 │-- data/
 │   ├── original_images/  # Raw images from the dataset
