@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>glcm</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>ensemble</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7510,20 +7510,1001 @@ a.anchor-link {
 </style>
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<main><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<main><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">skimage.feature</span><span class="w"> </span><span class="kn">import</span> <span class="n">graycomatrix</span><span class="p">,</span> <span class="n">graycoprops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">joblib</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">json_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID\class_labels.json"</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">json_path</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️ class_labels.json not found! Generating..."</span><span class="p">)</span>
+    <span class="n">dataset_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\dataset\Medicinal Leaf dataset"</span>
+    <span class="n">class_labels</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span> <span class="n">class_name</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">class_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)))}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">class_labels</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Class labels saved to </span><span class="si">{</span><span class="n">json_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">class_labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>⚠️ class_labels.json not found! Generating...
+✅ Class labels saved to D:\MED_LEAF_ID\class_labels.json
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_class_name</span><span class="p">(</span><span class="n">pred_class</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">class_labels</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pred_class</span><span class="p">),</span> <span class="s2">"Unknown Class"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EfficientNetB0Classifier</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EfficientNetB0Classifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">efficientnet_b0</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="n">classifier</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">in_features</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="s1">'dropout'</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">cnn_model_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\models\efficientnetb0_leaf_model.pth"</span>
+<span class="n">cnn_model</span> <span class="o">=</span> <span class="n">EfficientNetB0Classifier</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">cnn_model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cnn_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">))</span>
+<span class="n">cnn_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>C:\Users\aadhi\AppData\Local\Temp\ipykernel_30320\1827284094.py:3: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  cnn_model.load_state_dict(torch.load(cnn_model_path, map_location="cpu"))
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[24]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>EfficientNetB0Classifier(
+  (base_model): EfficientNet(
+    (features): Sequential(
+      (0): Conv2dNormActivation(
+        (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): SiLU(inplace=True)
+      )
+      (1): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32, bias=False)
+              (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(32, 8, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(8, 32, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (2): Conv2dNormActivation(
+              (0): Conv2d(32, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.0, mode=row)
+        )
+      )
+      (2): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(16, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(96, 96, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=96, bias=False)
+              (1): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(96, 4, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(4, 96, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(96, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.0125, mode=row)
+        )
+        (1): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(24, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+              (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(144, 6, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(6, 144, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(144, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.025, mode=row)
+        )
+      )
+      (3): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(24, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(144, 144, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=144, bias=False)
+              (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(144, 6, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(6, 144, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(144, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(40, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.037500000000000006, mode=row)
+        )
+        (1): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(40, 240, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(240, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(240, 240, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=240, bias=False)
+              (1): BatchNorm2d(240, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(240, 10, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(10, 240, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(240, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(40, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.05, mode=row)
+        )
+      )
+      (4): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(40, 240, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(240, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(240, 240, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=240, bias=False)
+              (1): BatchNorm2d(240, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(240, 10, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(10, 240, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(240, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(80, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.0625, mode=row)
+        )
+        (1): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=480, bias=False)
+              (1): BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(480, 20, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(20, 480, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(480, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(80, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.07500000000000001, mode=row)
+        )
+        (2): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=480, bias=False)
+              (1): BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(480, 20, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(20, 480, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(480, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(80, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.08750000000000001, mode=row)
+        )
+      )
+      (5): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(480, 480, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=480, bias=False)
+              (1): BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(480, 20, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(20, 480, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(480, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.1, mode=row)
+        )
+        (1): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(672, 672, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=672, bias=False)
+              (1): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(672, 28, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(28, 672, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(672, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.1125, mode=row)
+        )
+        (2): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(672, 672, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=672, bias=False)
+              (1): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(672, 28, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(28, 672, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(672, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(112, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.125, mode=row)
+        )
+      )
+      (6): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(672, 672, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=672, bias=False)
+              (1): BatchNorm2d(672, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(672, 28, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(28, 672, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(672, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.1375, mode=row)
+        )
+        (1): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(192, 1152, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(1152, 1152, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1152, bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(1152, 48, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(48, 1152, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(1152, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.15000000000000002, mode=row)
+        )
+        (2): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(192, 1152, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(1152, 1152, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1152, bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(1152, 48, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(48, 1152, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(1152, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.1625, mode=row)
+        )
+        (3): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(192, 1152, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(1152, 1152, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=1152, bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(1152, 48, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(48, 1152, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(1152, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.17500000000000002, mode=row)
+        )
+      )
+      (7): Sequential(
+        (0): MBConv(
+          (block): Sequential(
+            (0): Conv2dNormActivation(
+              (0): Conv2d(192, 1152, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (1): Conv2dNormActivation(
+              (0): Conv2d(1152, 1152, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1152, bias=False)
+              (1): BatchNorm2d(1152, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              (2): SiLU(inplace=True)
+            )
+            (2): SqueezeExcitation(
+              (avgpool): AdaptiveAvgPool2d(output_size=1)
+              (fc1): Conv2d(1152, 48, kernel_size=(1, 1), stride=(1, 1))
+              (fc2): Conv2d(48, 1152, kernel_size=(1, 1), stride=(1, 1))
+              (activation): SiLU(inplace=True)
+              (scale_activation): Sigmoid()
+            )
+            (3): Conv2dNormActivation(
+              (0): Conv2d(1152, 320, kernel_size=(1, 1), stride=(1, 1), bias=False)
+              (1): BatchNorm2d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            )
+          )
+          (stochastic_depth): StochasticDepth(p=0.1875, mode=row)
+        )
+      )
+      (8): Conv2dNormActivation(
+        (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (1): BatchNorm2d(1280, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (2): SiLU(inplace=True)
+      )
+    )
+    (avgpool): AdaptiveAvgPool2d(output_size=1)
+    (classifier): Sequential(
+      (0): Dropout(p=0.2, inplace=True)
+      (1): Linear(in_features=1280, out_features=80, bias=True)
+      (dropout): Dropout(p=0.2, inplace=False)
+    )
+  )
+)</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">rf_model_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\models\plant_classifier.pkl"</span>
+<span class="n">rf_model</span> <span class="o">=</span> <span class="n">joblib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rf_model_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [60]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">skimage.feature</span><span class="w"> </span><span class="kn">import</span> <span class="n">graycomatrix</span><span class="p">,</span> <span class="n">graycoprops</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_glcm_features</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"⚠️ Error: Image is None. Check if it's loaded correctly."</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"📸 Image Shape Before Processing: </span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Debugging</span>
+
+        <span class="c1"># Convert to grayscale</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># RGB/BGR Image</span>
+            <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Already grayscale</span>
+            <span class="n">gray</span> <span class="o">=</span> <span class="n">image</span>  
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🔹 Grayscale Image Shape: </span><span class="si">{</span><span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Debugging</span>
+
+        <span class="c1"># Check pixel value range</span>
+        <span class="k">if</span> <span class="n">gray</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">gray</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️ Warning: Image pixel values out of range (Min: </span><span class="si">{</span><span class="n">gray</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="s2">, Max: </span><span class="si">{</span><span class="n">gray</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+            <span class="n">gray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+        <span class="c1"># Compute GLCM</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># Adjust this based on training setup</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Adjust this based on training setup</span>
+
+        <span class="n">glcm</span> <span class="o">=</span> <span class="n">graycomatrix</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="n">distances</span><span class="o">=</span><span class="n">distances</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="n">angles</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Extract features</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span>
+        <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'contrast'</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'dissimilarity'</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'homogeneity'</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'energy'</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+        <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'correlation'</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+    <span class="c1"># graycoprops(glcm, 'ASM').flatten(),  # Comment this</span>
+        <span class="p">])</span>
+
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Extracted GLCM Features: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Debugging</span>
+
+        <span class="c1"># Ensure the correct number of features</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️ Error: Extracted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span><span class="si">}</span><span class="s2"> features instead of 30."</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">features</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️ GLCM feature extraction failed! Error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [61]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Convert RGB (Gradio) to BGR (OpenCV)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2BGR</span><span class="p">)</span>
+
+        <span class="c1"># CNN Prediction</span>
+        <span class="n">img_resized</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span> <span class="o">/</span> <span class="mf">255.0</span>
+        <span class="n">img_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">img_resized</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">cnn_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">cnn_model</span><span class="p">(</span><span class="n">img_tensor</span><span class="p">))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="c1"># GLCM + RandomForest Prediction</span>
+        <span class="n">glcm_features</span> <span class="o">=</span> <span class="n">extract_glcm_features</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">glcm_features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">glcm_features</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">"⚠️ Error: GLCM feature extraction failed!"</span>
+
+        <span class="n">rf_pred</span> <span class="o">=</span> <span class="n">rf_model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">glcm_features</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Weighted Ensemble (70% CNN, 30% RF)</span>
+        <span class="n">final_pred</span> <span class="o">=</span> <span class="n">cnn_pred</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.7</span> <span class="k">else</span> <span class="n">rf_pred</span>
+        <span class="n">plant_name</span> <span class="o">=</span> <span class="n">get_class_name</span><span class="p">(</span><span class="n">final_pred</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"🌿 Predicted Plant: </span><span class="si">{</span><span class="n">plant_name</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"⚠️ Error in prediction: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="c1"># Load class labels for debugging</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">class_mapping</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [62]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># Load class labels</span>
+<span class="n">json_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID\class_labels.json"</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">class_mapping</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Example: Your model predicts class index 0</span>
+<span class="n">predicted_class_index</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Replace this with your actual model prediction</span>
+
+<span class="c1"># Get the plant name</span>
+<span class="n">plant_name</span> <span class="o">=</span> <span class="n">class_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">predicted_class_index</span><span class="p">),</span> <span class="s2">"Unknown"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🌿 Predicted Plant Name: </span><span class="si">{</span><span class="n">plant_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>🌿 Predicted Plant Name: Aloevera
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [63]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">iface</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">Interface</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">predict</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">gr</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"numpy"</span><span class="p">),</span> <span class="n">outputs</span><span class="o">=</span><span class="s2">"text"</span><span class="p">)</span>
+<span class="n">iface</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>* Running on local URL:  http://127.0.0.1:7866
+
+To create a public link, set `share=True` in `launch()`.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div><iframe allow="autoplay; camera; microphone; clipboard-read; clipboard-write;" allowfullscreen="" frameborder="0" height="500" src="http://127.0.0.1:7866/" width="100%"></iframe></div>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[63]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre></pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (600, 450, 3)
+🔹 Grayscale Image Shape: (600, 450)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (512, 1024, 3)
+🔹 Grayscale Image Shape: (512, 1024)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (225, 225, 3)
+🔹 Grayscale Image Shape: (225, 225)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (512, 1024, 3)
+🔹 Grayscale Image Shape: (512, 1024)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (1080, 1080, 3)
+🔹 Grayscale Image Shape: (1080, 1080)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (600, 450, 3)
+🔹 Grayscale Image Shape: (600, 450)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (600, 450, 3)
+🔹 Grayscale Image Shape: (600, 450)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (600, 450, 3)
+🔹 Grayscale Image Shape: (600, 450)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (224, 224, 3)
+🔹 Grayscale Image Shape: (224, 224)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (224, 224, 3)
+🔹 Grayscale Image Shape: (224, 224)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>📸 Image Shape Before Processing: (224, 224, 3)
+🔹 Grayscale Image Shape: (224, 224)
+✅ Extracted GLCM Features: 30
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>d:\MED_LEAF_ID-1\base\Lib\site-packages\sklearn\utils\validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names
+  warnings.warn(
+</pre>
 </div>
 </div>
 </div>
@@ -7536,111 +8517,7 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">input_dir</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'D:\MED_LEAF_ID\data\preprocessed_glcm'</span>
-<span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>  <span class="c1"># Example distances</span>
-<span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">]</span>  <span class="c1"># Example angles in radians</span>
-<span class="n">allowed_extensions</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'.jpg'</span><span class="p">,</span> <span class="s1">'.png'</span><span class="p">,</span> <span class="s1">'.jpeg'</span><span class="p">}</span>
-<span class="n">features_list</span> <span class="o">=</span> <span class="p">[]</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Walk through all directories and files</span>
-<span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">input_dir</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">allowed_extensions</span><span class="p">:</span>
-            <span class="n">img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-
-            <span class="c1"># Extract class name from the folder structure (parent directory)</span>
-            <span class="n">class_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
-
-            <span class="c1"># Read image as grayscale</span>
-            <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"❌ Skipping unreadable image: </span><span class="si">{</span><span class="n">img_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-                <span class="k">continue</span>
-
-            <span class="c1"># Normalize the image to range [0, 255]</span>
-            <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">NORM_MINMAX</span><span class="p">)</span>
-
-            <span class="c1"># Extract GLCM features for each combination of distance and angle</span>
-            <span class="n">glcm_features</span> <span class="o">=</span> <span class="p">[]</span>
-
-            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">distances</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">:</span>
-                    <span class="c1"># Compute GLCM matrix</span>
-                    <span class="n">glcm</span> <span class="o">=</span> <span class="n">graycomatrix</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">distances</span><span class="o">=</span><span class="p">[</span><span class="n">d</span><span class="p">],</span> <span class="n">angles</span><span class="o">=</span><span class="p">[</span><span class="n">angle</span><span class="p">],</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-                    <span class="c1"># Extract GLCM properties</span>
-                    <span class="n">contrast</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'contrast'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                    <span class="n">energy</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'energy'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                    <span class="n">homogeneity</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'homogeneity'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                    <span class="n">correlation</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'correlation'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                    <span class="n">dissimilarity</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'dissimilarity'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                    <span class="n">asm</span> <span class="o">=</span> <span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'ASM'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                    <span class="n">entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">glcm</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">glcm</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
-
-                    <span class="c1"># Append features for this (d, angle) pair</span>
-                    <span class="n">glcm_features</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">contrast</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">homogeneity</span><span class="p">,</span> <span class="n">correlation</span><span class="p">,</span> <span class="n">dissimilarity</span><span class="p">,</span> <span class="n">asm</span><span class="p">,</span> <span class="n">entropy</span><span class="p">])</span>
-
-            <span class="c1"># Add the class name and features of this image to the list</span>
-            <span class="n">features_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">class_name</span><span class="p">,</span> <span class="n">filename</span><span class="p">]</span> <span class="o">+</span> <span class="n">glcm_features</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Define the columns for the DataFrame</span>
-<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Class_Name'</span><span class="p">,</span> <span class="s1">'Image_Name'</span><span class="p">]</span>  <span class="c1"># First two columns: class name and image name</span>
-<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">distances</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">angles</span><span class="p">:</span>
-        <span class="n">columns</span> <span class="o">+=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s1">'contrast_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'energy_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'homogeneity_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'correlation_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'dissimilarity_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'asm_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'entropy_d</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s1">_a</span><span class="si">{</span><span class="n">angle</span><span class="si">}</span><span class="s1">'</span>
-        <span class="p">]</span>
-
-<span class="c1"># Create a DataFrame from the list of features</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features_list</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Save the DataFrame to a CSV file</span>
-<span class="n">output_file</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">'D:\MED_LEAF_ID\data\glcm_features.csv'</span>
-<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Features extracted and saved to </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 </div>
 </div>

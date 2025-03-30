@@ -7515,7 +7515,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -7531,13 +7531,13 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">original_dataset_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID\dataset\Medicinal Leaf dataset"</span>
-<span class="n">augmented_dataset_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID\data\augmented"</span>
-<span class="n">preprocessed_original_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID\data\cnn\original"</span>
-<span class="n">preprocessed_augmented_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID\data\cnn\augmented"</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">original_dataset_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\dataset\Medicinal Leaf dataset"</span>
+<span class="n">augmented_dataset_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\data\augmented"</span>
+<span class="n">preprocessed_original_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\data\cnn\original"</span>
+<span class="n">preprocessed_augmented_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"D:\MED_LEAF_ID-1\data\cnn\augmented"</span>
 </pre></div>
 </div>
 </div>
@@ -7548,7 +7548,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_directory_structure</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">preprocessed_path</span><span class="p">):</span>
@@ -7568,7 +7568,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">preprocess_image_for_cnn</span><span class="p">(</span><span class="n">image_path</span><span class="p">):</span>
@@ -7598,7 +7598,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">preprocess_and_save_images</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">preprocessed_path</span><span class="p">):</span>
@@ -7625,7 +7625,34 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">preprocess_and_save_images</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">preprocessed_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Processes and saves images with minimal transformations."""</span>
+    <span class="k">for</span> <span class="n">class_folder</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">):</span>
+        <span class="n">class_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">class_folder</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">class_path</span><span class="p">):</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preprocessed_path</span><span class="p">,</span> <span class="n">class_folder</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">image_file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">class_path</span><span class="p">):</span>
+                <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">class_path</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)</span>
+                <span class="n">processed_image</span> <span class="o">=</span> <span class="n">preprocess_image_for_cnn</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">processed_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Convert back to uint8 (0-255) before saving</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">image_file</span><span class="p">),</span> <span class="p">(</span><span class="n">processed_image</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping image: </span><span class="si">{</span><span class="n">image_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
@@ -7637,6 +7664,19 @@ a.anchor-link {
     
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Preprocessing complete with minimal tuning!"</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Preprocessing complete with minimal tuning!
+</pre>
 </div>
 </div>
 </div>

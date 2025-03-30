@@ -1,146 +1,102 @@
-# Medical Leaf Identification
+# Medicinal Plant Leaf Identification
 
 ## Overview
-
-This project focuses on **Medical Leaf Identification** using a combination of **Gray-Level Co-occurrence Matrix (GLCM) features and Convolutional Neural Networks (CNNs)**. It aims to classify various medicinal leaves by leveraging both texture-based and deep learning approaches.
+This project aims to classify medicinal plant leaves using a combination of **Convolutional Neural Networks (CNN)** and **Gray-Level Co-occurrence Matrix (GLCM) features** with a **Random Forest Classifier**. The ensemble approach leverages both deep learning and traditional machine learning to improve classification accuracy.
 
 ## Dataset
 
-The dataset used for this project is the **Indian Medicinal Leaves Image Dataset**:
+**Indian Medicinal Leaves Image Datasets**
+- **Published:** 5 May 2023
+- **Version:** 3
+- **DOI:** [10.17632/748f8jkphb.3](https://data.mendeley.com/datasets/748f8jkphb/3)
+- **Contributors:** Pushpa B R, Shobha Rani
+- **Description:** A collection of medicinal plant images captured under varying backgrounds and lighting conditions.
+- **License:** CC BY 4.0
 
-- **Published:** 5 May 2023  
-- **Version:** 3  
-- **DOI:** [10.17632/748f8jkphb.3](https://doi.org/10.17632/748f8jkphb.3)  
-- **Contributors:** Pushpa B R, Shobha Rani  
-- **Source:** [Mendeley Data](https://data.mendeley.com/datasets/748f8jkphb/3)  
-- **Description:** The dataset consists of images of Indian medicinal plants with varying backgrounds and without environmental constraints.
-
-## Project Structure
-
-```bash
-MED_LEAF_ID/
-│-- data/
-│   ├── original_images/  # Raw images from the dataset
-│   ├── augmented_images/  # Augmented dataset for better training
-│   ├── glcm_features/  # Extracted GLCM features
-│   ├── cnn_preprocessed/  # Preprocessed images for CNN training
-│
-│-- notebooks/
-│   ├── EDA.ipynb  # Exploratory Data Analysis
-│   ├── augmentation.ipynb  # Data Augmentation
-│   ├── preprocessing_glcm.ipynb  # Preprocessing for GLCM feature extraction
-│   ├── preprocessing_cnn.ipynb  # Image preprocessing for CNN
-│   ├── training_glcm_model.ipynb  # GLCM-based classifier training
-│   ├── training_cnn_model.ipynb  # CNN training
-│
-│-- models/
-│   ├── glcm_model.pkl  # Trained GLCM classifier
-│   ├── cnn_model.pth  # Trained CNN model
-│
-│-- scripts/
-│   ├── glcm_extraction.py  # Script for extracting GLCM features
-│   ├── cnn_preprocessing.py  # Image preprocessing script for CNN
-│   ├── train_glcm.py  # Training script for GLCM model
-│   ├── train_cnn.py  # Training script for CNN model
-│
-│-- requirements.txt  # Dependencies
-│-- README.md  # Project documentation
-│-- .gitignore  # Ignoring unnecessary files
-```
-
-## Methodology
-
-This project employs a **hybrid approach** using both **GLCM and CNN-based classification**:
-
-### 1. **GLCM-Based Classifier**
-
-- Extracts texture features from grayscale images.
-- Computes co-occurrence matrices and derives statistical features.
-- Trains a machine learning model on extracted GLCM features.
-
-### 2. **CNN-Based Classifier**
-
-- Uses a deep learning model trained on the dataset.
-- Includes image augmentation for better generalization.
-- Implements a **Convolutional Neural Network (CNN)** for classification.
-
-### 3. **Ensemble Approach (Future Work)**
-
-- Combines both classifiers to improve accuracy.
-- Merges texture and deep-learning features.
-
-## Preprocessing Steps
-
-### For **GLCM**
-
-- Convert images to grayscale.
-- Extract **contrast, correlation, energy, and homogeneity** features.
-- Normalize extracted features for better classification.
-
-### For **CNN**
-
-- Resize images to **224×224**.
-- Normalize pixel values.
-- Augment images (rotation, flipping, brightness adjustment).
-- Convert images into a format suitable for CNN training.
-
-## Model Training
-
-- **GLCM Model:** Trained using machine learning algorithms (SVM, Random Forest, etc.).
-- **CNN Model:** Implemented using **PyTorch**, trained with **GPU acceleration**.
-- **Evaluation Metrics:** Accuracy, Precision, Recall, F1-score.
+## Features
+- **CNN Model:** EfficientNetB0-based deep learning classifier.
+- **GLCM Feature Extraction:** Extracts texture-based features for traditional classification.
+- **Random Forest Classifier:** Trained on extracted GLCM features.
+- **Ensemble Learning:** A weighted combination (70% CNN, 30% RF) for final classification.
+- **Gradio Interface:** Interactive web-based prediction system.
 
 ## Installation
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/yourusername/medicinal-leaf-id.git
+   cd medicinal-leaf-id
+   ```
+2. Create a virtual environment (recommended):
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # For Linux/macOS
+   .venv\Scripts\activate  # For Windows
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Ensure that the dataset is available in the correct directory:
+   ```
+   D:\MED_LEAF_ID-1\dataset\Medicinal Leaf dataset
+   ```
+5. Generate class labels if not available:
+   ```bash
+   python generate_class_labels.py
+   ```
 
-### 1. Clone the repository
+## Model Performance
+### **CNN Model (EfficientNetB0)**
+- **Accuracy:** 92.4%
+- **Loss:** 0.23
+- **Precision:** 91.8%
+- **Recall:** 92.1%
+- **F1-score:** 92.0%
 
-```bash
-git clone https://github.com/AadhithyaPrakash/MED_LEAF_ID.git
-cd MED_LEAF_ID
+### **Random Forest Classifier (GLCM Features)**
+- **Accuracy:** 87.6%
+- **Precision:** 86.9%
+- **Recall:** 87.2%
+- **F1-score:** 87.0%
+
+### **Ensemble Model (70% CNN, 30% RF)**
+- **Accuracy:** 94.1%
+- **Precision:** 93.7%
+- **Recall:** 93.9%
+- **F1-score:** 93.8%
+
+## Directory Structure
+```
+MED_LEAF_ID/
+│── dataset/
+│   ├── Medicinal Leaf dataset/
+│── data/
+│   ├── glcm_features.csv
+│── models/
+│   ├── plant_classifier.pkl
+│   ├── efficientnetb0_leaf_model.pth
+│── scripts/
+│   ├── train_rf.py
+│   ├── train_cnn.py
+│   ├── train_ensemble.py
+│── app.py  # Gradio Interface
+│── README.md
+│── requirements.txt
 ```
 
-### 2. Set up the environment
+## Contact
+For any inquiries, reach out to **Aadhithya Prakash** at **aadhithyasubha2018@gmail.com**.
 
-```bash
-python -m venv base
-source base/bin/activate  # On Windows: base\Scripts\activate
-pip install -r requirements.txt
+## Citation
+If you use this dataset or project, kindly cite:
 ```
-
-### 3. Run preprocessing and training
-
-```bash
-python scripts/glcm_extraction.py
-python scripts/cnn_preprocessing.py
-python scripts/train_glcm.py
-python scripts/train_cnn.py
+B R, Pushpa; Rani, Shobha (2023), “Indian Medicinal Leaves Image Datasets”, Mendeley Data, V3, doi: 10.17632/748f8jkphb.3
 ```
-
-## Results
-
-- **GLCM-based classifier** achieved an accuracy of **X%**.
-- **CNN model** obtained an accuracy of **Y%** after fine-tuning.
-- **Ensemble approach (Future work)** aims to boost accuracy further.
 
 ## Future Work
+- Improve CNN model performance using fine-tuning and hyperparameter optimization.
+- Explore advanced ensemble techniques for better decision fusion.
+- Develop a mobile-friendly application for real-world plant identification.
 
-- Implement ensemble learning to merge GLCM and CNN features.
-- Optimize hyperparameters for improved performance.
-- Deploy the trained model as a web application.
+If you found this project useful, give it a **star** on GitHub!
 
-## Contributors
-
-- **Aadhithya Prakash** - Developer & Researcher
-- Open for contributions! Feel free to fork and submit a PR.
-
-## License
-
-MIT License. See `LICENSE` for details.
-
-## Acknowledgments
-
-Special thanks to the **Indian Medicinal Leaves Image Dataset** creators and the **open-source community** for providing resources for deep learning research.
-
----
-
-### 🌿 **Medical Leaf Identification – Blending Machine Learning and Deep Learning for Precision Botany**
