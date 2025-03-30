@@ -1,46 +1,28 @@
 import os
 
-repo_path = r"D:\MED_LEAF_ID"
-ignore_dirs = {"base", ".git"}
-data_folders = {
-    "D:\\MED_LEAF_ID\\data\\augmented",
-    "D:\\MED_LEAF_ID\\data\\cnn",
-    "D:\\MED_LEAF_ID\\data\\cnn\\augmented",
-    "D:\\MED_LEAF_ID\\data\\cnn\\original",
-    "D:\\MED_LEAF_ID\\data\\preprocessed_glcm",
-}
-data_file = "D:\\MED_LEAF_ID\\data\\glcm_features.csv"
-dataset_folder = (
-    r"D:\MED_LEAF_ID\dataset\Medicinal Leaf dataset"  # Define dataset directory
-)
+def write_directory_structure(base_path, output_file):
+    def should_exclude_dir(dirname):
+        # Exclude base and .git directories
+        return dirname in {'.git', 'base'}
 
-output_file = "repo_structure.txt"
+    def format_dir_name(dirname):
+        # Replace 'dataset' and 'data' with placeholders
+        if dirname in {'dataset', 'data'}:
+            return f"{dirname}/[...]"
+        return dirname
 
-with open(output_file, "w", encoding="utf-8") as f:
-    for root, dirs, files in os.walk(repo_path):
-        # Skip ignored directories
-        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+    with open(output_file, 'w') as f:
+        for root, dirs, files in os.walk(base_path):
+            # Filter out excluded directories
+            dirs[:] = [d for d in dirs if not should_exclude_dir(d)]
+            # Write the directory structure
+            level = root.replace(base_path, '').count(os.sep)
+            indent = ' ' * 4 * level
+            dir_name = os.path.basename(root)
+            if dir_name:  # Skip the base directory itself
+                f.write(f"{indent}{format_dir_name(dir_name)}/\n")
 
-        # Hide all subdirectories inside "dataset/Medicinal Leaf dataset"
-        if root == dataset_folder:
-            f.write(f"\n📂 Directory: {root}/ (Only showing folder name)\n")
-            dirs.clear()  # Prevent subdirectories from being listed
-            continue
-
-        # Show only specific folders in data/
-        elif root in data_folders or root == os.path.dirname(data_file):
-            dirs[:] = [d for d in dirs if os.path.join(root, d) in data_folders]
-            files = [file for file in files if os.path.join(root, file) == data_file]
-            f.write(f"\n📂 Directory: {root}/ (Filtered view)\n")
-
-        # Standard listing for everything else
-        else:
-            f.write(f"\n📂 Directory: {root}\n")
-
-        for d in dirs:
-            f.write(f"   📁 {d}/\n")
-        for file in files:
-            f.write(f"   ├── {file}\n")
-
-print(f"✅ Repo structure saved to {output_file}")
-print("📁 Directory structure:" )
+# Example usage
+base_path = 'D:\MED_LEAF_ID-1'
+output_file = 'D:\MED_LEAF_ID-1\directory.txt'
+write_directory_structure(base_path, output_file)
