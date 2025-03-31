@@ -40,10 +40,6 @@ This project aims to classify medicinal plant leaves using a combination of **Co
    ```
    D:\MED_LEAF_ID-1\dataset\Medicinal Leaf dataset
    ```
-5. Generate class labels if not available:
-   ```bash
-   python generate_class_labels.py
-   ```
 
 ## Model Performance
 ### **CNN Model (EfficientNetB0)**
